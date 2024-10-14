@@ -2,11 +2,10 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
+// use std::vec::*;
 
 #[derive(Debug)]
 struct Node<T> {
@@ -22,6 +21,7 @@ impl<T> Node<T> {
         }
     }
 }
+
 #[derive(Debug)]
 struct LinkedList<T> {
     length: u32,
@@ -69,16 +69,47 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+        pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self 
+        where
+            T: PartialOrd + Copy,
+        {
+            let mut result = LinkedList::new();
+    
+            let mut current_a = list_a.start;
+            let mut current_b = list_b.start;
+    
+            while let (Some(a_ptr), Some(b_ptr)) = (current_a, current_b) {
+                let a = unsafe { &*a_ptr.as_ptr() };
+                let b = unsafe { &*b_ptr.as_ptr() };
+    
+                if a.val < b.val {
+                    result.add(a.val);
+                    current_a = a.next;
+                } else {
+                    result.add(b.val);
+                    current_b = b.next;
+                }
+            }
+    
+            // Add the remaining elements of list_a
+            while let Some(a_ptr) = current_a {
+                let a = unsafe { &*a_ptr.as_ptr() };
+                result.add(a.val);
+                current_a = a.next;
+            }
+    
+            // Add the remaining elements of list_b
+            while let Some(b_ptr) = current_b {
+                let b = unsafe { &*b_ptr.as_ptr() };
+                result.add(b.val);
+                current_b = b.next;
+            }
+    
+            result
         }
-	}
-}
+    }
+
 
 impl<T> Display for LinkedList<T>
 where

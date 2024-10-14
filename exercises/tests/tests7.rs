@@ -34,9 +34,30 @@
 // Execute `rustlings hint tests7` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+use std::env;
 
-fn main() {}
+fn main() {
+    // 获取环境变量 TEST_FOO
+    let test_foo = env::var("TEST_FOO").unwrap();
+
+    // 将环境变量的值解析为 u64 类型
+    let test_foo_value: u64 = test_foo.parse().expect("TEST_FOO must be a number");
+
+    // 获取当前的 Unix 时间戳
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs();
+
+    // 检查 TEST_FOO 的值是否在当前时间前后10秒内
+    if now >= test_foo_value && now < test_foo_value + 10 {
+        // 如果在范围内，告诉 Cargo 继续构建过程
+        println!("cargo:rerun-if-env-changed=TEST_FOO");
+    } else {
+        // 如果不在范围内，输出错误信息并退出构建过程
+        panic!("TEST_FOO is not within 10 seconds of the current time.");
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -9,29 +9,27 @@
 // Execute `rustlings hint from_str` or use the `hint` watch subcommand for a
 // hint.
 
-use std::num::ParseIntError;
-use std::str::FromStr;
+// use std::num::ParseIntError;
+// use std::str::FromStr;
 
-#[derive(Debug, PartialEq)]
-struct Person {
-    name: String,
-    age: usize,
-}
+// #[derive(Debug, PartialEq)]
+// struct Person {
+//     name: String,
+//     age: usize,
+// }
 
-// We will use this error type for the `FromStr` implementation.
-#[derive(Debug, PartialEq)]
-enum ParsePersonError {
-    // Empty input string
-    Empty,
-    // Incorrect number of fields
-    BadLen,
-    // Empty name field
-    NoName,
-    // Wrapped error from parse::<usize>()
-    ParseInt(ParseIntError),
-}
-
-// I AM NOT DONE
+// // We will use this error type for the `FromStr` implementation.
+// #[derive(Debug, PartialEq)]
+// enum ParsePersonError {
+//     // Empty input string
+//     Empty,
+//     // Incorrect number of fields
+//     BadLen,
+//     // Empty name field
+//     NoName,
+//     // Wrapped error from parse::<usize>()
+//     ParseInt(ParseIntError),
+// }
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -49,10 +47,49 @@ enum ParsePersonError {
 // you want to return a string error message, you can do so via just using
 // return `Err("my error message".into())`.
 
+use std::num::ParseIntError;
+use std::str::FromStr;
+
+#[derive(Debug, PartialEq)]
+struct Person {
+    name: String,
+    age: usize,
+}
+
+#[derive(Debug, PartialEq)]
+enum ParsePersonError {
+    Empty,
+    BadLen,
+    NoName,
+    ParseInt(ParseIntError),
+}
+
 impl FromStr for Person {
     type Err = ParsePersonError;
-    fn from_str(s: &str) -> Result<Person, Self::Err> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        //TODO
+        if s.is_empty() {
+            return Err(ParsePersonError::Empty);
+        }
+
+        let parts: Vec<&str> = s.split(',').collect();
+        if parts.len() != 2 {
+            return Err(ParsePersonError::BadLen);
+        }
+
+        let name = parts[0].trim();
+        if name.is_empty() {
+            return Err(ParsePersonError::NoName);
+        }
+
+        let age = parts[1].trim().parse::<usize>().map_err(ParsePersonError::ParseInt)?;
+        
+        Ok(Person {
+            name: name.to_string(),
+            age,
+        })
     }
+
 }
 
 fn main() {
